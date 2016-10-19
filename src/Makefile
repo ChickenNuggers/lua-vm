@@ -38,7 +38,7 @@ LIB_O=	lauxlib.o lbaselib.o lbitlib.o lcorolib.o ldblib.o liolib.o \
 BASE_O= $(CORE_O) $(LIB_O) $(MYOBJS)
 
 ALL_O= $(BASE_O) $(LUA_O)
-ALL_T= $(LUA_A) $(LUA_T) $(LUA_SO)
+ALL_T= $(LUA_A) $(LUA_SO)
 ALL_A= $(LUA_A)
 
 # Targets start here.
@@ -50,15 +50,14 @@ o:	$(ALL_O)
 
 a:	$(ALL_A)
 
+so:	$(LUA_SO)
+
 $(LUA_A): $(BASE_O)
 	$(AR) $@ $(BASE_O)
 	$(RANLIB) $@
 
 $(LUA_SO): $(CORE_O) $(LIB_O)
 	$(CC) -o $@ -shared $?
-
-$(LUA_T): $(LUA_O) $(LUA_A)
-	$(CC) -o $@ $(LDFLAGS) $(LUA_O) $(LUA_A) $(LIBS)
 
 clean:
 	$(RM) $(ALL_T) $(ALL_O)
@@ -78,6 +77,9 @@ echo:
 
 # Convenience targets for popular platforms
 ALL= all
+
+noop:
+	#pass
 
 none:
 	@echo "Please do 'make PLATFORM' where PLATFORM is one of these:"
@@ -108,7 +110,7 @@ macosx:
 	$(MAKE) $(ALL) SYSCFLAGS="-DLUA_USE_MACOSX" SYSLIBS="-lreadline" CC=cc
 
 mingw:
-	$(MAKE) "LUA_A=lua53.dll" "LUA_T=lua.exe" \
+	$(MAKE) "LUA_A=lua53.dll" "LUA_SO=noop" \
 	"AR=$(CC) -shared -o" "RANLIB=strip --strip-unneeded" \
 	"SYSCFLAGS=-DLUA_BUILD_AS_DLL" "SYSLIBS=" "SYSLDFLAGS=-s" lua.exe
 
